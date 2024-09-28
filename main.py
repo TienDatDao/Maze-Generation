@@ -4,18 +4,18 @@ import numpy as np
 import random
 import sys
 
-sys.setrecursionlimit(2000)
+sys.setrecursionlimit(20000)
 
 pygame.init()
 
 
-BLOCK = 20
+BLOCK = 10
 BLOCK_WIDTH = 51
 BLOCK_HEIGHT = 51
 WIDTH, HEIGHT = BLOCK*BLOCK_WIDTH, BLOCK*BLOCK_HEIGHT
 
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
-pygame.display.set_caption("Draw circle")
+pygame.display.set_caption("Maze_Generation")
 FPS = 60
 
 arr_check = [[0 for _ in range(int(WIDTH/BLOCK)+5)] for _ in range(int(HEIGHT/BLOCK)+5)]
