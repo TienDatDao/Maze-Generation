@@ -1,1 +1,1 @@
-I haven't finished the code yet.
+To use this code, you need to download pygame first
