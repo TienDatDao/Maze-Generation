@@ -9,9 +9,9 @@ sys.setrecursionlimit(20000)
 
 pygame.init()
 
-BLOCK = 2
-BLOCK_WIDTH = 351
-BLOCK_HEIGHT = 351
+BLOCK = 20
+BLOCK_WIDTH = 21
+BLOCK_HEIGHT = 21
 FIND_SHORTEST_PATH = True
 
 WIDTH, HEIGHT = BLOCK*BLOCK_WIDTH, BLOCK*BLOCK_HEIGHT
@@ -23,7 +23,7 @@ FPS = 60
 arr_check = [[0 for _ in range(int(WIDTH/BLOCK)+5)] for _ in range(int(HEIGHT/BLOCK)+5)]
 
 # Find the shortest path from cell (1,1) to the bottom right cell. The path will be highlighted in red.
-def bfs():
+def bfs():  
     
     for i in range(0, int(WIDTH/BLOCK)):
         for j in range(0, int(HEIGHT/BLOCK)):
@@ -109,12 +109,33 @@ def draw_grid():
             else:
                 pygame.draw.rect(WIN, color.BLUE, (x, y, BLOCK, BLOCK))
 
-def main():
+def sum_side_wall(x, y):
+    sum = 0
+    if arr_check[x+1][y] == 0 and arr_check[x-1][y] == 0 and arr_check[x][y+1] != 0 and arr_check[x][y-1] != 0:     
+        return True
+    if arr_check[x+1][y] != 0 and arr_check[x-1][y] != 0 and arr_check[x][y+1] == 0 and arr_check[x][y-1] == 0:     
+        return True
+
+def delete_random_wall(n):
+    while n > 0:
+        x = random.randint(1, int(WIDTH/BLOCK)-2)
+        y = random.randint(1, int(HEIGHT/BLOCK)-2)
+        if arr_check[x][y] == 0 and sum_side_wall(x,y):
+            arr_check[x][y] = 1
+            n -= 1
+
+
+def maze_generation():
     create_table()
     arr_check[1][1] = 2
     dfs(1, 1, 1, 1)
+    NUMBER_WALLS = random.randint(0,BLOCK_WIDTH)
+    delete_random_wall(NUMBER_WALLS)
     if FIND_SHORTEST_PATH:
         bfs()
+
+def main():
+    maze_generation()
     clock = pygame.time.Clock()
     run = True
     while run:
