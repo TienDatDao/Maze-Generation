@@ -3,15 +3,17 @@ import color
 import numpy as np
 import random
 import sys
+from collections import deque
 
 sys.setrecursionlimit(20000)
 
 pygame.init()
 
+BLOCK = 2
+BLOCK_WIDTH = 351
+BLOCK_HEIGHT = 351
+FIND_SHORTEST_PATH = True
 
-BLOCK = 10
-BLOCK_WIDTH = 51
-BLOCK_HEIGHT = 51
 WIDTH, HEIGHT = BLOCK*BLOCK_WIDTH, BLOCK*BLOCK_HEIGHT
 
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -20,10 +22,52 @@ FPS = 60
 
 arr_check = [[0 for _ in range(int(WIDTH/BLOCK)+5)] for _ in range(int(HEIGHT/BLOCK)+5)]
 
+# Find the shortest path from cell (1,1) to the bottom right cell. The path will be highlighted in red.
+def bfs():
+    
+    for i in range(0, int(WIDTH/BLOCK)):
+        for j in range(0, int(HEIGHT/BLOCK)):
+            if arr_check[i][j] != 0:
+                arr_check[i][j] = 2
+
+    dx = [0, 0, 1, -1]
+    dy = [1, -1, 0, 0]
+
+    Queue = deque([(1, 1)])
+
+    arr_par = [[(0, 0) for _ in range(int(WIDTH/BLOCK)+5)] for _ in range(int(HEIGHT/BLOCK)+5)]
+    visited = [[False for _ in range(int(WIDTH/BLOCK)+5)] for _ in range(int(HEIGHT/BLOCK)+5)]
+
+    visited[1][1] = True
+
+    while len(Queue) > 0:
+        x = Queue[0][0]
+        y = Queue[0][1]
+        Queue.popleft()
+
+        for i in range(0, 4):
+            x_ = x + dx[i]
+            y_ = y + dy[i]
+            if visited[x_][y_] == False and arr_check[x_][y_] == 2:
+                Queue.append((x_,y_))
+                visited[x_][y_] = True
+                arr_par[x_][y_] = (x, y)
+
+    x = int(WIDTH/BLOCK)-2
+    y = int(HEIGHT/BLOCK)-2
+    while x > 1 or y > 1:
+        arr_check[x][y] = 1
+        x, y = arr_par[x][y]
+    
+    arr_check[1][1] = 1
+
+
+
 def create_table():
     for i in range(1, int(WIDTH/BLOCK)-1):
         for j in range(1, int(HEIGHT/BLOCK)-1):
             if i % 2 == 1 and j % 2 == 1:
+                
                 arr_check[i][j] = 1
 
 def delete_wall(x, y, x_, y_):
@@ -58,13 +102,19 @@ def draw_grid():
             y = j*BLOCK
             if arr_check[i][j] == 0:
                 pygame.draw.rect(WIN, color.BLACK, (x, y, BLOCK, BLOCK))
-            else:
+            elif arr_check[i][j] == 2:
                 pygame.draw.rect(WIN, color.WHITE, (x, y, BLOCK, BLOCK))
+            elif arr_check[i][j] == 1:
+                pygame.draw.rect(WIN, color.GREEN, (x, y, BLOCK, BLOCK))
+            else:
+                pygame.draw.rect(WIN, color.BLUE, (x, y, BLOCK, BLOCK))
 
 def main():
     create_table()
     arr_check[1][1] = 2
     dfs(1, 1, 1, 1)
+    if FIND_SHORTEST_PATH:
+        bfs()
     clock = pygame.time.Clock()
     run = True
     while run:
